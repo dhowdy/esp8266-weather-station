@@ -1,4 +1,5 @@
 # ThingPulse ESP8266 Weather Station
+### With enhancements by Neptune and Don Howdeshell
 
 
 [![ThingPulse logo](https://thingpulse.com/assets/ThingPulse-w300.svg)](https://thingpulse.com)
@@ -34,14 +35,24 @@ Make sure you use a version of the Arduino IDE which is supported by the ESP8266
 * ESP8266 Weather Station
 * JSON Streaming Parser by Daniel Eichhorn
 * ESP8266 OLED Driver for SSD1306 display by Daniel Eichhorn. **Use Version 3.0.0 or higher!**
+* DHT Sensor Library by Adafruit
+* SimpleDSTadjust by Neptune
+* WiFiManager by tzapu
+* Adafruit Unified Sesnor by Adafruit
+
 
 ## Prepare the software
 * [Create an API Key](https://docs.thingpulse.com/how-tos/openweathermap-key/) for OpenWeatherMap
 * In the Arduino IDE go to `File` > `Examples` > `ESP8266 Weather Station` > `Weather Station Demo`
-* Enter the OpenWeatherMap API Key
-* Enter your WiFi credentials
-* Adjust the location according to OpenWeatherMap API, e.g. Zurich, CH
-* Adjust UTC offset
+* Adjust the model of DHT sensor by commenting or uncommenting corresponding lines
+* Change the author name for the splash screen
+* Enter the OpenWeatherMap API or Wunderground Key
+* Adjust the location according to OpenWeatherMap and/or Wunderground API, e.g. Rolla, US or Rolla MO
+* Adjust language settings, if necessary
+* Adjust UTC offset, if necessary
+* Adjust metric settings, if necessary
+* Adjust NTP server settings, if necessary
+* Enable or disable ThingSpeak and enter channel and API keys
 
 ## Setup for PlatformIO
 
@@ -75,6 +86,8 @@ We will gladly list it here as third party library...
 The weather information provider we used so far (Wunderground) [recently stopped their free tier](https://thingpulse.com/weather-underground-no-longer-providing-free-api-keys/) without previous notice on May 15, 2018. This release adds support for a new provider with a free tier for weather information: OpenWeatherMap.com. The basic demo (WeatherStationDemo) has been adapted to use this new API through the OpenWeatherMapCurrent and OpenWeatherMapForecast REST clients.
 
 Sadly OpenWeatherMap provides less information than Wunderground did (or still does). If you are missing attributes in the response documents then please [contact the OpenWeatherMap team](https://openweathermap.desk.com/customer/portal/emails/new).
+
+The modifications by Don Howdeshell allow switching between these providers
 
 **ESP8266 OLED Library upgrade**
 
