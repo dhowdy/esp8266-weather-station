@@ -36,6 +36,7 @@ See more at https://thingpulse.com
 * Added dewpoint status for wunderground (or placeholder for arbitrary data)
 * Added wind speed for openweathermap (or placeholder for arbitrary data)
 * Data, settings, and other things not needed for the RTD workshop have been removed
+* Added option to switch between manual WiFi and WiFi Manager
 * 
 */
 
@@ -184,7 +185,10 @@ void setup() {
   wifiManager.autoConnect();
 
   //Manual Wifi
-  // WiFi.begin(SSID, PASSWORD);
+  #ifdef ManualWifi
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  #endif
+  //WiFi Manager
   String hostname(HOSTNAME);
   hostname += String(ESP.getChipId(), HEX);
   WiFi.hostname(hostname);

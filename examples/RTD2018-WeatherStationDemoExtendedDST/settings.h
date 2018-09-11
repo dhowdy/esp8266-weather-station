@@ -36,6 +36,7 @@ See more at http://blog.squix.ch
 * Added dewpoint status for wunderground (or placeholder for arbitrary data)
 * Added wind speed for openweathermap (or placeholder for arbitrary data)
 * Data, settings, and other things not needed for the RTD workshop have been removed
+* Added option to switch between manual WiFi and WiFi Manager
 * 
 */
 
@@ -120,6 +121,13 @@ char FormattedHumidity[10];
 // Set your name to be displayed on the splash screen
 const String AUTHOR_NAME = "Don Howdeshell";
 
+// Manual Wifi
+//#define ManualWifi
+
+#ifdef ManualWifi
+const char* WIFI_SSID = "yourssid";
+const char* WIFI_PASSWORD = "yourpassw0rd";
+#endif
 
 //DST rules for US Central Time Zone (St. Louis, Chicago)
 #define UTC_OFFSET -6
