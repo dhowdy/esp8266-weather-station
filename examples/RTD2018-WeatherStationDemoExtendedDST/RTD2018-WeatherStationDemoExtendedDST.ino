@@ -29,7 +29,7 @@ See more at https://thingpulse.com
 * Added RTD Logo and customization line
 * Added Oxygen-Regular size 10 as a splash screen font to coincide with other RTD branding
 * Converted the project from using Weather Underground to OpenWeatherMap
-* Added the ability to switch between Wundergroundand OWM
+* Added the ability to switch between Wunderground and OWM
 * Moved and re-aligned text to work with bicolor LCD
 * Fixed a bug with NTP settings
 * Americanized the settings
@@ -37,6 +37,7 @@ See more at https://thingpulse.com
 * Added wind speed for openweathermap (or placeholder for arbitrary data)
 * Data, settings, and other things not needed for the RTD workshop have been removed
 * Added option to switch between manual WiFi and WiFi Manager
+* TODO: Add option to look up city by OWM City ID
 * 
 */
 
@@ -379,20 +380,20 @@ void drawCurrentWeather(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t
   display->setFont(ArialMT_Plain_10);
   display->setTextAlignment(TEXT_ALIGN_LEFT);
   #ifdef OWMClient
-  display->drawString(60 + x, 5 + y, currentWeather.description);
+  display->drawString(54 + x, 5 + y, currentWeather.description);
   
   
   display->setFont(ArialMT_Plain_10);
   display->setTextAlignment(TEXT_ALIGN_LEFT);
-  display->drawString(60 + x, 38 + y, "Wind: " + String(int(currentWeather.windSpeed)) + " MPH"); //Round to the nearest integer
+  display->drawString(54 + x, 38 + y, "Wind: " + String(int(currentWeather.windSpeed)) + " MPH"); //Round to the nearest integer
   #else
-  display->drawString(60 + x, 5 + y, wunderground.getWeatherText());
+  display->drawString(54 + x, 5 + y, wunderground.getWeatherText());
   
 
-  //TODO: Figure out dewpoint on OWM
+  
   display->setFont(ArialMT_Plain_10);
   display->setTextAlignment(TEXT_ALIGN_LEFT);
-  display->drawString(60 + x, 38 + y, "Dewpoint: " + wunderground.getDewPoint() + "°");
+  display->drawString(54 + x, 38 + y, "Dewpoint: " + wunderground.getDewPoint() + "°");
   #endif
 
   display->setFont(ArialMT_Plain_24);
@@ -402,7 +403,7 @@ void drawCurrentWeather(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t
   String temp = wunderground.getCurrentTemp() + (WU_IS_METRIC ? "°C": "°F");
   #endif
 
-  display->drawString(60 + x, 15 + y, temp);
+  display->drawString(54 + x, 15 + y, temp);
   int tempWidth = display->getStringWidth(temp);
 
   display->setFont(Meteocons_Plain_42);

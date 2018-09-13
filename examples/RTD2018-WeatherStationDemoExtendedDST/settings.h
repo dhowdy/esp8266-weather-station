@@ -37,6 +37,7 @@ See more at http://blog.squix.ch
 * Added wind speed for openweathermap (or placeholder for arbitrary data)
 * Data, settings, and other things not needed for the RTD workshop have been removed
 * Added option to switch between manual WiFi and WiFi Manager
+* TODO: Add option to look up city by OWM City ID
 * 
 */
 
