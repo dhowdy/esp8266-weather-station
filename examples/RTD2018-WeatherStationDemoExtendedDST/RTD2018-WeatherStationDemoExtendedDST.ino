@@ -37,6 +37,8 @@ See more at https://thingpulse.com
 * Added wind speed for openweathermap (or placeholder for arbitrary data)
 * Data, settings, and other things not needed for the RTD workshop have been removed
 * Added option to switch between manual WiFi and WiFi Manager
+* Actually got ThingSpeak working
+* Different spacing on white OLED vs Blue/Yellow
 * TODO: Add option to look up city by OWM City ID
 * 
 */
@@ -86,7 +88,15 @@ See more at https://thingpulse.com
 #include "WeatherStationFonts.h"
 #include "WeatherStationImages.h"
 #include "DSEG7Classic-BoldFont.h"
-#include "ThingspeakClient.h"
+
+#ifdef TSClient
+//#include "ThingspeakClient.h" Old version
+#include "ThingSpeak.h"
+float field0 = 0.0;
+float field1 = 0.0;
+#endif
+
+
 
 #ifdef OWMClient
 // Initalize OpenWeatherMap client
@@ -106,9 +116,11 @@ DHT dht(DHTPIN, DHTTYPE);
 float humidity = 0.0;
 float temperature = 0.0;
 
-#ifdef TSClient
-ThingspeakClient thingspeak;
-#endif
+
+
+//#ifdef TSClient
+//ThingspeakClient thingspeak;  Old version
+//#endif
 
 // flag changed in the ticker function every 10 minutes
 bool readyForWeatherUpdate = false;
@@ -117,7 +129,9 @@ bool readyForDHTUpdate = false;
 
 String lastUpdate = "--";
 
-Ticker ticker;
+Ticker DHTticker;
+Ticker Wticker;
+
 
 //declaring prototypes
 void configModeCallback (WiFiManager *myWiFiManager);
@@ -185,6 +199,12 @@ void setup() {
   //or use this for auto generated name ESP + ChipID
   wifiManager.autoConnect();
 
+  // Initalize Thingspeak
+  #ifdef TSClient
+  WiFiClient client;
+  ThingSpeak.begin(client);
+  #endif
+
   //Manual Wifi
   #ifdef ManualWifi
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -235,14 +255,15 @@ void setup() {
 
   updateData(&display);
 
-  ticker.attach(UPDATE_INTERVAL_SECS, setReadyForWeatherUpdate);
-  ticker.attach(60, setReadyForDHTUpdate);
+  Wticker.attach(UPDATE_INTERVAL_SECS, setReadyForWeatherUpdate);
+  DHTticker.attach(60, setReadyForDHTUpdate);
 }
 
 void loop() {
 
   if (readyForWeatherUpdate && ui.getUiState()->frameState == FIXED) {
     updateData(&display);
+    Serial.println("ready.");
   }
 
   if (readyForDHTUpdate && ui.getUiState()->frameState == FIXED)
@@ -324,8 +345,13 @@ void updateData(OLEDDisplay *display) {
   delay(500);
 
   #ifdef TSClient
-  drawProgress(display, 90, "Updating thingspeak...");
-  thingspeak.getLastChannelItem(THINGSPEAK_CHANNEL_ID, THINGSPEAK_API_READ_KEY);
+  drawProgress(display, 90, "Updating ThingSpeak Data...");
+  //thingspeak.getLastChannelItem(THINGSPEAK_CHANNEL_ID, THINGSPEAK_API_READ_KEY);  Old
+  field0 = ThingSpeak.readFloatField(THINGSPEAK_CHANNEL_ID, 1, THINGSPEAK_API_READ_KEY);
+  field1 = ThingSpeak.readFloatField(THINGSPEAK_CHANNEL_ID, 2, THINGSPEAK_API_READ_KEY);
+  Serial.println("ThingSpeak sensor data is:");
+  Serial.println(field0);
+  Serial.println(field1);
   readyForWeatherUpdate = false;
   drawProgress(display, 100, "Done...");
   delay(1000);
@@ -393,7 +419,11 @@ void drawCurrentWeather(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t
   
   display->setFont(ArialMT_Plain_10);
   display->setTextAlignment(TEXT_ALIGN_LEFT);
+  #ifdef WhiteOLED
   display->drawString(54 + x, 38 + y, "Dewpoint: " + wunderground.getDewPoint() + "°");
+  #else
+  display->drawString(54 + x, 35 + y, "Dewpoint: " + wunderground.getDewPoint() + "°");
+  #endif
   #endif
 
   display->setFont(ArialMT_Plain_24);
@@ -460,11 +490,23 @@ void drawIndoor(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int1
 void drawThingspeak(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
   display->setTextAlignment(TEXT_ALIGN_CENTER);
   display->setFont(ArialMT_Plain_10);
-  display->drawString(64 + x, 0 + y, "Thingspeak Sensor");
+  display->drawString(64 + x, 0 + y, "Garage Temp and Pressure");
   display->setFont(ArialMT_Plain_16);
-  display->drawString(64 + x, 12 + y, thingspeak.getFieldValue(0) + "°C");
+
+  //field0 = ThingSpeak.readFloatField(THINGSPEAK_CHANNEL_ID, 1, THINGSPEAK_API_READ_KEY);
+  //field1 = ThingSpeak.readFloatField(THINGSPEAK_CHANNEL_ID, 2, THINGSPEAK_API_READ_KEY);
+  dtostrf(field0,4, 1, FormattedField0);
+  dtostrf(field1,4, 1, FormattedField1);
+  display->drawString(64 + x, 12 + y, "Temp: " + String(FormattedField0) + "°F");
+  display->drawString(64 + x, 30 + y, "Press: " + String(FormattedField1) + " inHG");
+  
+  
+  //display->drawString(64 + x, 12 + y, thingspeak.getFieldValue(0) + " °F"); Old
   // display->drawString(64 + x, 12 + y, thingspeak.getFieldValue(0) + (IS_METRIC ? "°C": "°F"));  // Needs code to convert Thingspeak temperature string
-  display->drawString(64 + x, 30 + y, thingspeak.getFieldValue(1) + "%");
+  //display->drawString(64 + x, 30 + y, thingspeak.getFieldValue(1) + " inHG"); Old
+
+
+  
 }
 #endif
 
@@ -496,7 +538,7 @@ void drawForecastDetails(OLEDDisplay *display, int x, int y, int dayIndex) {
   display->drawString(x + 20, y + 12, wunderground.getForecastIcon(dayIndex));
 
   display->setFont(ArialMT_Plain_10);
-  display->drawString(x + 20, y + 34, wunderground.getForecastLowTemp(dayIndex) + "|" + wunderground.getForecastHighTemp(dayIndex));
+  display->drawString(x + 20, y + 34, wunderground.getForecastLowTemp(dayIndex) + " | " + wunderground.getForecastHighTemp(dayIndex));
   display->setTextAlignment(TEXT_ALIGN_LEFT);
   #endif
 }

@@ -36,8 +36,6 @@ See more at http://blog.squix.ch
 * Added dewpoint status for wunderground (or placeholder for arbitrary data)
 * Added wind speed for openweathermap (or placeholder for arbitrary data)
 * Data, settings, and other things not needed for the RTD workshop have been removed
-* Added option to switch between manual WiFi and WiFi Manager
-* TODO: Add option to look up city by OWM City ID
 * 
 */
 
@@ -83,6 +81,9 @@ See more at http://blog.squix.ch
 // Setup
 const int UPDATE_INTERVAL_SECS = 10 * 60; // Update every 10 minutes
 
+// White OLED or Blue and Yellow
+#define WhiteOLED
+
 #ifdef spiOLED
 // Pin definitions for SPI OLED
 #define OLED_CS     D8  // Chip select
@@ -122,13 +123,6 @@ char FormattedHumidity[10];
 // Set your name to be displayed on the splash screen
 const String AUTHOR_NAME = "Don Howdeshell";
 
-// Manual Wifi
-//#define ManualWifi
-
-#ifdef ManualWifi
-const char* WIFI_SSID = "yourssid";
-const char* WIFI_PASSWORD = "yourpassw0rd";
-#endif
 
 //DST rules for US Central Time Zone (St. Louis, Chicago)
 #define UTC_OFFSET -6
@@ -145,14 +139,14 @@ struct dstRule EndRule = {"CST", First, Sun, Nov, 1, 0};       // Central Standa
 const boolean IS_METRIC = false;
 
 // Enable or disable OpenWeatherMap or Wunderground
-#define OWMClient
+//#define OWMClient
 
 #ifdef OWMClient
 // OpenWeatherMap Settings
 // Sign up here to get an API key:
 // https://docs.thingpulse.com/how-tos/openweathermap-key/
 const boolean OWM_IS_METRIC = false;
-String OPEN_WEATHER_MAP_APP_ID = "XXXXXXX";
+String OPEN_WEATHER_MAP_APP_ID = "5ab72a03588aebce1212bc7f720d6c11";
 String OPEN_WEATHER_MAP_LOCATION = "Rolla,US"; //4406282
 
 // Adjust according to your language
@@ -174,7 +168,7 @@ String OPEN_WEATHER_MAP_LANGUAGE = "en";
 #else
 // Wunderground Settings
 const boolean WU_IS_METRIC = false;
-const String WUNDERGRROUND_API_KEY = "XXXXXXX";
+const String WUNDERGRROUND_API_KEY = "4c079a08c8cb9a20";
 const String WUNDERGRROUND_LANGUAGE = "EN"; // as per https://www.wunderground.com/weather/api/d/docs?d=resources/country-to-iso-matching
 const String WUNDERGROUND_COUNTRY = "MO";
 const String WUNDERGROUND_CITY = "Rolla";
@@ -184,10 +178,15 @@ const String WUNDERGROUND_CITY = "Rolla";
 
 // Thingspeak Settings
 // Enable or disable Thingspeak data fetch (if you have another sensor that you want to fetch data from)
-//#define TSClient
+#define TSClient
 #ifdef TSClient
-const String THINGSPEAK_CHANNEL_ID = "XXXXXXX";
-const String THINGSPEAK_API_READ_KEY = "XXXXXXX";
+//const String THINGSPEAK_CHANNEL_ID = "583396";  //Old Settings 
+//const String THINGSPEAK_API_READ_KEY = "QTF6OEC3Q0EMULPA"; // Old Settings
+char FormattedField0[10];
+char FormattedField1[10];
+
+unsigned long THINGSPEAK_CHANNEL_ID = 583396;
+const char * THINGSPEAK_API_READ_KEY = "QTF6OEC3Q0EMULPA";
 #endif
 
 #ifdef spiOLED
